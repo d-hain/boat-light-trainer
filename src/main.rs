@@ -10,7 +10,7 @@ use rand::thread_rng;
 /// A Boat type
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 enum Boat {
-    SegelfahrzeugUnter7m,
+    KleinfahrzeugUnter7m,
     SegelfahrzeugBis20m,
     SegelfahrzeugUeber20m,
     MaschinenfahrzeugBis50m,
@@ -29,7 +29,7 @@ enum Boat {
 impl Display for Boat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Boat::SegelfahrzeugUnter7m => write!(f, "Segelfahrzeug unter 7m"),
+            Boat::KleinfahrzeugUnter7m => write!(f, "Kleinfahrzeug unter 7m"),
             Boat::SegelfahrzeugBis20m => write!(f, "Segelfahrzeug bis 20m"),
             Boat::SegelfahrzeugUeber20m => write!(f, "Segelfahrzeug über 20m"),
             Boat::MaschinenfahrzeugBis50m => write!(f, "Maschinenfahrzeug bis 50m"),
@@ -49,7 +49,7 @@ impl Display for Boat {
 
 /// List of all boats
 const BOATS: [Boat; 14] = [
-    Boat::SegelfahrzeugUnter7m,
+    Boat::KleinfahrzeugUnter7m,
     Boat::SegelfahrzeugBis20m,
     Boat::SegelfahrzeugUeber20m,
     Boat::MaschinenfahrzeugBis50m,
@@ -68,7 +68,7 @@ const BOATS: [Boat; 14] = [
 /// A map of all boats and their respective images
 const BOAT_IMAGES: [(Boat, egui::ImageSource<'static>); 14] = [
     (
-        Boat::SegelfahrzeugUnter7m,
+        Boat::KleinfahrzeugUnter7m,
         egui::include_image!("../images/segelfahrzeug-unter-7m.png"),
     ),
     (
@@ -216,7 +216,7 @@ fn which_boat_has_these_lights(
     ui.horizontal(|ui| {
         ui.label("Boot: ");
         egui::ComboBox::from_label("")
-            .selected_text(format!("{:?}", app.selected_boat))
+            .selected_text(format!("{}", app.selected_boat))
             .show_ui(ui, |ui| {
                 for boat in BOATS.iter() {
                     ui.selectable_value(&mut app.selected_boat, *boat, boat.to_string());
