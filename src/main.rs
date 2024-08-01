@@ -7,6 +7,7 @@ use egui::{ImageSource, RichText};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
+/// A Boat type
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 enum Boat {
     SegelfahrzeugUnter7m,
@@ -46,6 +47,7 @@ impl Display for Boat {
     }
 }
 
+/// List of all boats
 const BOATS: [Boat; 14] = [
     Boat::SegelfahrzeugUnter7m,
     Boat::SegelfahrzeugBis20m,
@@ -63,6 +65,7 @@ const BOATS: [Boat; 14] = [
     Boat::Schleppverband,
 ];
 
+/// A map of all boats and their respective images
 const BOAT_IMAGES: [(Boat, egui::ImageSource<'static>); 14] = [
     (
         Boat::SegelfahrzeugUnter7m,
@@ -122,10 +125,15 @@ const BOAT_IMAGES: [(Boat, egui::ImageSource<'static>); 14] = [
     ),
 ];
 
+/// App state
 struct App {
+    /// If the app is running or not
     playing: bool,
+    /// List of boat images (needed because I randomize them)
     boat_images: Vec<(Boat, ImageSource<'static>)>,
+    /// The index of the current boat_image
     boat_images_index: usize,
+    /// The currently selected boat in the Dropdown menu
     selected_boat: Boat,
 }
 
@@ -144,7 +152,7 @@ fn main() -> eframe::Result {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
 
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([320.0, 240.0]),
+        viewport: egui::ViewportBuilder::default().with_inner_size([1000.0, 800.0]),
         ..Default::default()
     };
 
@@ -163,14 +171,17 @@ fn main() -> eframe::Result {
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
+            // Not really needed but oh well
             if ui.button("Beenden").clicked() {
                 std::process::exit(0);
             }
 
+            // All Boats are done
             if self.boat_images_index == self.boat_images.len() {
                 self.playing = false;
                 ui.heading(RichText::new("Alle Boote durchgespielt!").color(egui::Color32::GREEN));
 
+                // Reset the game
                 if ui.button("Nochmal spielen").clicked() {
                     self.boat_images_index = 0;
                     self.boat_images = randomize_boat_images();
@@ -185,6 +196,7 @@ impl eframe::App for App {
             let (boat, image) = &self.boat_images[self.boat_images_index];
             let is_correct = which_boat_has_these_lights(ui, self, *boat, image.clone());
 
+            // Next Question
             if ui.button("Nächste Frage").clicked() && is_correct {
                 self.boat_images_index += 1;
             }
@@ -200,6 +212,7 @@ fn which_boat_has_these_lights(
 ) -> bool {
     ui.heading("Welche Boote haben diese Lichter?");
 
+    // Dropdown menu to select a boat
     ui.horizontal(|ui| {
         ui.label("Boot: ");
         egui::ComboBox::from_label("")
@@ -211,8 +224,10 @@ fn which_boat_has_these_lights(
             });
     });
 
-    ui.add(egui::Image::new(image).max_width(1000.0));
+    // Boat image
+    ui.add(egui::Image::new(image).max_height(700.0));
 
+    // Display if the selected boat is correct
     if real_boat == app.selected_boat {
         ui.heading(RichText::new("Richtig!").color(egui::Color32::GREEN));
         true
@@ -222,6 +237,7 @@ fn which_boat_has_these_lights(
     }
 }
 
+/// Randomize the boat images
 fn randomize_boat_images() -> Vec<(Boat, ImageSource<'static>)> {
     let mut vec = BOAT_IMAGES.to_vec();
     vec.shuffle(&mut thread_rng());
